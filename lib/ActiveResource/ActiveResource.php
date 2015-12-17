@@ -175,7 +175,9 @@ class ActiveResource {
 		}
 
 		// Get the plural name after removing namespaces
-		$this->element_name_plural = $this->pluralize ($this->element_name);
+		if ($this->element_name_plural == '') {
+      $this->element_name_plural = $this->pluralize ($this->element_name);
+  }
 
 		// if configuration file (config.ini.php) exists use it (overwrite class properties/attribute values).
 		$config_file_path = dirname (__FILE__) . '/' . 'config.ini.php';
