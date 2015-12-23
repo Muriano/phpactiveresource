@@ -183,8 +183,9 @@ class ActiveResource {
 		$config_file_path = dirname (__FILE__) . '/' . 'config.ini.php';
 		if (file_exists ($config_file_path)) {
 			$properties = parse_ini_file ($config_file_path);
-			foreach ($properties as $property => $value )
+			foreach ($properties as $property => $value ){
 				$this->{$property} = $value;
+   }
 		}
 	}
 
@@ -575,7 +576,8 @@ class ActiveResource {
 			$res = array ();
 			$cls = get_class ($this);
 			foreach ($xml->children () as $child) {
-				$obj = new $cls;
+				//$obj = new $cls;
+    $obj = clone $this;
 				foreach ((array) $child as $k => $v) {
 					$k = str_replace ('-', '_', $k);
 					if (isset ($v['nil']) && $v['nil'] == 'true') {
