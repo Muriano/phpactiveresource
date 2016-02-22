@@ -568,19 +568,24 @@ class ActiveResource {
 		}
 
 		// parse XML response
-  try {
+  libxml_use_internal_errors(true);
+  $xml = simplexml_load_string($res);
 
-    $xml = new SimpleXMLElement ($res);
+  if (count(libxml_get_errors()) > 0) {
 
-  } catch (Exception $e) {
+    if (strpos($res, 'created') !== false) {
 
-      if (strpost($res, 'created') !== false) {
+        return true;
 
-          return true;
+    } else {
 
-      }
+        return false;
+
+    }
 
   }
+
+  libxml_clear_errors();
 
 		// normalize xml element name in case rails ressource contains an underscore
 		if (str_replace ('-', '_', $xml->getName ()) == $this->element_name_plural) {
