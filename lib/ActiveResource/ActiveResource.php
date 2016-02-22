@@ -12,36 +12,36 @@ use SimpleXMLElement;
  * Usage:
  *
  *     <?php
- *     
+ *
  *     require_once ('ActiveResource.php');
- *     
+ *
  *     class Song extends ActiveResource {
  *         public $site = 'http://localhost:3000/';
  *         public $element_name = 'songs';
  *     }
- *     
+ *
  *     // create new item
  *     $song = new Song (array ('artist' => 'Joe Cocker', 'title' => 'A Little Help From My Friends'));
  *     $song->save ();
- *     
+ *
  *     // fetch and update an item
  *     $song->find (44)->set ('title', 'The River')->save ();
- *     
+ *
  *     // line by line
  *     $song->find (44);
  *     $song->title = 'The River';
  *     $song->save ();
- *     
+ *
  *     // get all songs
  *     $songs = $song->find ('all');
- *     
+ *
  *     // delete a song
  *     $song->find (44);
  *     $song->destroy ();
- *     
+ *
  *     // custom method
  *     $songs = $song->get ('by_year', array ('year' => 1999));
- *     
+ *
  *     ?>
  *
  * @author John Luxford <lux@companymachine.com>
@@ -66,9 +66,9 @@ class ActiveResource {
 
 	/**
 	 * HTTP Basic Authentication password
-	 */	
+	 */
 	public $password = null;
-	
+
 	/**
 	 * The remote collection, e.g., person or thing
 	 */
@@ -268,7 +268,7 @@ class ActiveResource {
 	 */
 	public function get ($method, $options = array ()) {
 		$req = $this->site . $this->element_name_plural;
-        if (isset ($this->_data['id']) && $this->_data['id']) { 
+        if (isset ($this->_data['id']) && $this->_data['id']) {
           $req .= '/' . $this->_data['id'];
         }
         $req .= '/' . $method . '.xml';
@@ -299,7 +299,7 @@ class ActiveResource {
 	 */
 	public function put ($method, $options = array (), $options_as_xml = false, $start_tag = false) {
 		$req = $this->site . $this->element_name_plural;
-        if (isset ($this->_data['id']) && $this->_data['id']) { 
+        if (isset ($this->_data['id']) && $this->_data['id']) {
         	$req .= '/' . $this->_data['id'];
         }
         $req .= '/' . $method . '.xml';
@@ -380,38 +380,38 @@ class ActiveResource {
 		$l = strlen($c);
 		// copy the offset
 		$index = $i;
-		
+
 		// check it's a valid offset
 		if ($index >= $l) {
 			return false;
 		}
-		
+
 		// check the value
 		$o = ord($c[$index]);
-		
+
 		// if it's ascii
 		if ($o <= 0x7F) {
 			return $o;
-		
+
 		// not sure what it is...
 		} elseif ($o < 0xC2) {
 			return false;
-		
-		// if it's a two-byte character	
+
+		// if it's a two-byte character
 		} elseif ($o <= 0xDF && $index < $l - 1) {
 			$i += 1;
 			return ($o & 0x1F) <<	6 | (ord($c[$index + 1]) & 0x3F);
-		
+
 		// three-byte
 		} elseif ($o <= 0xEF && $index < $l - 2) {
 			$i += 2;
 			return ($o & 0x0F) << 12 | (ord($c[$index + 1]) & 0x3F) << 6 | (ord($c[$index + 2]) & 0x3F);
-			
+
 		// four-byte
 		} elseif ($o <= 0xF4 && $index < $l - 3) {
 			$i += 3;
 			return ($o & 0x0F) << 18 | (ord($c[$index + 1]) & 0x3F) << 12 | (ord($c[$index + 2]) & 0x3F) << 6 | (ord($c[$index + 3]) & 0x3F);
-			
+
 		// not sure what it is...
 		} else {
 			return false;
@@ -434,27 +434,27 @@ class ActiveResource {
 			return $s;
 		}
 		$s = (string) $s;
-		
+
 		// create the return string
 		$r = '';
 		// get the length
 		$l = strlen($s);
-		
+
 		// iterate the string
 		for ($i = 0; $i < $l; $i++) {
 			// get the value of the character
 			$o = $this->_unicode_ord($s, $i);
-			
+
 			// valid characters
 			$v = (
 				// \t \n <vertical tab> <form feed> \r
-				($o >= 9 && $o <= 13) || 
+				($o >= 9 && $o <= 13) ||
 				// <space> !
-				($o == 32) || ($o == 33) || 
+				($o == 32) || ($o == 33) ||
 				// # $ %
-				($o >= 35 && $o <= 37) || 
+				($o >= 35 && $o <= 37) ||
 				// ( ) * + , - . /
-				($o >= 40 && $o <= 47) || 
+				($o >= 40 && $o <= 47) ||
 				// numbers
 				($o >= 48 && $o <= 57) ||
 				// : ;
@@ -466,48 +466,48 @@ class ActiveResource {
 				// uppercase
 				($o >= 65 && $o <= 90) ||
 				// [ \ ] ^ _ `
-				($o >= 91 && $o <= 96) || 
+				($o >= 91 && $o <= 96) ||
 				// lowercase
-				($o >= 97 && $o <= 122) || 
+				($o >= 97 && $o <= 122) ||
 				// { | } ~
 				($o >= 123 && $o <= 126)
 			);
-			
+
 			// if it's valid, just keep it
 			if ($v) {
 				$r .= $s[$i];
-			
+
 			// &
 			} elseif ($o == 38) {
 				$r .= '&amp;';
-			
+
 			// <
 			} elseif ($o == 60) {
 				$r .= '&lt;';
-			
+
 			// >
 			} elseif ($o == 62) {
 				$r .= '&gt;';
-			
+
 			// '
 			} elseif ($o == 39) {
 				$r .= '&apos;';
-			
+
 			// "
 			} elseif ($o == 34) {
 				$r .= '&quot;';
-			
+
 			// unknown, add it as a reference
 			} elseif ($o > 0) {
 				if ($hex) {
 					$r .= '&#x'.strtoupper(dechex($o)).';';
-					
+
 				} else {
 					$r .= '&#'.$o.';';
 				}
 			}
 		}
-		
+
 		return $r;
 	}
 
@@ -568,16 +568,28 @@ class ActiveResource {
 		}
 
 		// parse XML response
-		$xml = new SimpleXMLElement ($res);
+  try {
+
+    $xml = new SimpleXMLElement ($res);
+
+  } catch (Exception $e) {
+
+      if (strpost($res, 'created') !== false) {
+
+          return true;
+
+      }
+
+  }
 
 		// normalize xml element name in case rails ressource contains an underscore
 		if (str_replace ('-', '_', $xml->getName ()) == $this->element_name_plural) {
 			// multiple
 			$res = array ();
 			$cls = get_class ($this);
+   $obj = clone $this;
 			foreach ($xml->children () as $child) {
 				//$obj = new $cls;
-    $obj = clone $this;
 				foreach ((array) $child as $k => $v) {
 					$k = str_replace ('-', '_', $k);
 					if (isset ($v['nil']) && $v['nil'] == 'true') {
@@ -629,7 +641,7 @@ class ActiveResource {
 
 		/* HTTP Basic Authentication */
 		if ($this->user && $this->password) {
-			curl_setopt ($ch, CURLOPT_USERPWD, $this->user . ":" . $this->password);	
+			curl_setopt ($ch, CURLOPT_USERPWD, $this->user . ":" . $this->password);
 		}
 
 		if ($this->request_format == 'xml') {
